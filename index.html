@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Meet A.X.E.L. - An interactive cyber robot companion with cursor-tracking eyes, voice synthesis, dynamic emotions, and playable mini-games.">
+  <meta name="theme-color" content="#090d16">
+  <title>A.X.E.L. // Interactive Cyber Robot Companion</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="cyan">
+  <!-- Interactive Particle Background Canvas -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <div class="app-layout">
+    <!-- Top Cyber Header Navigation -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-badge">
+          <span class="status-indicator"></span>
+          <span class="brand-code">A.X.E.L. v2.5</span>
+        </div>
+        <h1 class="brand-title">CYBER COMPANION</h1>
+      </div>
+
+      <div class="header-controls">
+        <!-- Audio Mute/Unmute Toggle -->
+        <button id="audioToggleBtn" class="cyber-btn-ghost" title="Toggle Sound FX & Speech" aria-label="Toggle Sound Effects">
+          <svg class="icon-speaker" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path class="sound-wave" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path class="sound-wave" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <span id="audioStatusText">AUDIO ON</span>
+        </button>
+
+        <!-- Theme Preset Picker -->
+        <div class="theme-selector-wrap" title="Robot Core Color">
+          <span class="theme-label">CORE:</span>
+          <div class="theme-dots">
+            <button class="theme-dot active" data-color="cyan" style="--c: #00f0ff;" aria-label="Cyan Core"></button>
+            <button class="theme-dot" data-color="magenta" style="--c: #ff007f;" aria-label="Magenta Core"></button>
+            <button class="theme-dot" data-color="emerald" style="--c: #10b981;" aria-label="Emerald Core"></button>
+            <button class="theme-dot" data-color="amber" style="--c: #f59e0b;" aria-label="Amber Core"></button>
+            <button class="theme-dot" data-color="violet" style="--c: #a855f7;" aria-label="Violet Core"></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Interactive Stage -->
+    <main class="main-stage">
+      <!-- Left Column: Robot Status & Quick Interactions -->
+      <section class="panel-column left-panel">
+        <!-- Status Card -->
+        <div class="glass-card stat-card">
+          <div class="card-header">
+            <span class="card-tag">SYSTEM METRICS</span>
+            <span class="system-time" id="systemClock">00:00:00</span>
+          </div>
+
+          <div class="metric-group">
+            <div class="metric-row">
+              <span class="metric-name">ENERGY CORE</span>
+              <span class="metric-val" id="energyVal">98%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-fill" id="energyBar" style="width: 98%;"></div>
+            </div>
+          </div>
+
+          <div class="metric-group">
+            <div class="metric-row">
+              <span class="metric-name">HAPPINESS INDEX</span>
+              <span class="metric-val" id="happinessVal">100%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-fill happiness-fill" id="happinessBar" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="metric-group">
+            <div class="metric-row">
+              <span class="metric-name">CURRENT MOOD</span>
+              <span class="metric-val highlight" id="moodStatusText">CURIOUS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Interaction Actions -->
+        <div class="glass-card actions-card">
+          <h2 class="card-title">INTERACTIONS</h2>
+          <div class="action-grid">
+            <button class="action-btn" id="btnPet" data-tooltip="Pat on the head">
+              <span class="action-icon">👋</span>
+              <span class="action-label">Pet A.X.E.L.</span>
+            </button>
+            <button class="action-btn" id="btnFeed" data-tooltip="Recharge energy">
+              <span class="action-icon">⚡</span>
+              <span class="action-label">Recharge</span>
+            </button>
+            <button class="action-btn" id="btnDance" data-tooltip="Dance party mode!">
+              <span class="action-icon">🎵</span>
+              <span class="action-label">Dance Party</span>
+            </button>
+            <button class="action-btn" id="btnJoke" data-tooltip="Hear a robot joke">
+              <span class="action-icon">🤖</span>
+              <span class="action-label">Tell Joke</span>
+            </button>
+            <button class="action-btn" id="btnTrivia" data-tooltip="Cyber tech facts">
+              <span class="action-icon">💡</span>
+              <span class="action-label">Tech Fact</span>
+            </button>
+            <button class="action-btn" id="btnHighFive" data-tooltip="Clap and celebrate">
+              <span class="action-icon">🙌</span>
+              <span class="action-label">High Five</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mood Switcher -->
+        <div class="glass-card mood-card">
+          <h2 class="card-title">MOOD SELECTOR</h2>
+          <div class="mood-pill-list">
+            <button class="mood-pill active" data-mood="curious">Curious</button>
+            <button class="mood-pill" data-mood="happy">Happy</button>
+            <button class="mood-pill" data-mood="love">Blushing</button>
+            <button class="mood-pill" data-mood="thinking">Analyzing</button>
+            <button class="mood-pill" data-mood="party">Party Time</button>
+            <button class="mood-pill" data-mood="sleepy">Sleep Mode</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Column: The Animated Interactive Robot Avatar -->
+      <section class="robot-stage-column">
+        <!-- Floating Speech Bubble -->
+        <div class="speech-bubble-container" id="speechContainer">
+          <div class="speech-bubble" id="speechBubble">
+            <span class="bubble-arrow"></span>
+            <p id="speechText">Greetings, human! Move your mouse around — I'm watching you! Click me anytime.</p>
+          </div>
+        </div>
+
+        <!-- 3D Robot Stage Wrapper -->
+        <div class="robot-avatar-wrapper" id="robotAvatar">
+          <!-- Ambient Halo Aura Glow -->
+          <div class="robot-glow-aura" id="robotAura"></div>
+
+          <!-- WebGL 3D Container -->
+          <div id="webglContainer" class="webgl-container"></div>
+
+          <!-- 3D Loading Overlay -->
+          <div id="loadingOverlay" class="loading-overlay">
+            <div class="cyber-spinner"></div>
+            <div class="loading-text">INITIALIZING 3D NEURAL CORE...</div>
+            <div class="loading-progress-bar">
+              <div id="loadingProgressFill" class="loading-progress-fill" style="width: 0%;"></div>
+            </div>
+            <div id="loadingPercentText" class="loading-percent">0%</div>
+          </div>
+
+          <!-- Bottom Control Pill: Click Me / Hint -->
+          <div class="robot-hud-tag" id="hudHintTag">
+            <span class="hud-pulse"></span>
+            <span>DRAG TO ORBIT // CLICK ROBOT TO POKE</span>
+          </div>
+        </div>
+
+        <!-- Modern 3D UI Control Panel (7 Buttons) -->
+        <div class="control-panel-card glass-card" id="robotControlsPanel">
+          <div class="panel-header-mini">
+            <span class="card-tag">3D CONTROL MATRIX</span>
+            <span class="active-badge" id="animationStatusBadge">● KINEMATICS ACTIVE</span>
+          </div>
+
+          <div class="controls-toolbar" role="toolbar" aria-label="3D Robot Navigation Controls">
+            <!-- 1. Reset View -->
+            <button class="ctrl-btn" id="btnResetView" title="Reset Camera & Angle" aria-label="Reset View">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+              <span class="ctrl-label">Reset View</span>
+            </button>
+
+            <!-- 2. Rotate Robot -->
+            <button class="ctrl-btn" id="btnRotateRobot" title="Toggle 360° Turntable Rotation" aria-label="Rotate Robot">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"></path>
+              </svg>
+              <span class="ctrl-label" id="rotateBtnLabel">Rotate Robot</span>
+            </button>
+
+            <!-- 3. Zoom In -->
+            <button class="ctrl-btn" id="btnZoomIn" title="Zoom Camera Closer" aria-label="Zoom In">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="11" y1="8" x2="11" y2="14"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
+              </svg>
+              <span class="ctrl-label">Zoom In</span>
+            </button>
+
+            <!-- 4. Zoom Out -->
+            <button class="ctrl-btn" id="btnZoomOut" title="Zoom Camera Farther" aria-label="Zoom Out">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
+              </svg>
+              <span class="ctrl-label">Zoom Out</span>
+            </button>
+
+            <!-- 5. Robot Animation -->
+            <button class="ctrl-btn is-active" id="btnRobotAnimation" title="Start Kinematic Motion" aria-label="Robot Animation">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span class="ctrl-label">Robot Animation</span>
+            </button>
+
+            <!-- 6. Stop Animation -->
+            <button class="ctrl-btn" id="btnStopAnimation" title="Stop All Motion" aria-label="Stop Animation">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+              </svg>
+              <span class="ctrl-label">Stop Animation</span>
+            </button>
+
+            <!-- 7. Robot Information -->
+            <button class="ctrl-btn ctrl-btn-accent" id="btnRobotInfo" title="View 3D Model Specs & Telemetry" aria-label="Robot Information">
+              <svg class="ctrl-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span class="ctrl-label">Robot Information</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat / Prompt Box to Talk to A.X.E.L. -->
+        <div class="chat-terminal-wrap">
+          <form class="chat-form" id="chatForm">
+            <div class="terminal-prefix">A.X.E.L. &gt;</div>
+            <input 
+              type="text" 
+              id="chatInput" 
+              class="terminal-input" 
+              placeholder="Type a command or ask me anything (e.g. 'tell me a secret', 'flip coin', 'dance')..." 
+              autocomplete="off" 
+              maxlength="100"
+            />
+            <button type="submit" class="cyber-btn-send" id="btnSendChat" aria-label="Send message">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Mini-Games Hub -->
+      <section class="panel-column right-panel">
+        <div class="glass-card games-card">
+          <div class="card-header">
+            <span class="card-tag">ARCADE MATRIX</span>
+            <div class="game-tabs" role="tablist">
+              <button class="tab-btn active" data-game="simon" role="tab" id="tabSimon">SIMON</button>
+              <button class="tab-btn" data-game="rps" role="tab" id="tabRps">R-P-S</button>
+              <button class="tab-btn" data-game="reflex" role="tab" id="tabReflex">REFLEX</button>
+            </div>
+          </div>
+
+          <!-- Game 1: Robot Simon Says (Memory Game) -->
+          <div class="game-container active" id="gameSimon">
+            <div class="game-info-bar">
+              <div class="info-item">
+                <span class="label">LEVEL</span>
+                <span class="val" id="simonLevel">1</span>
+              </div>
+              <div class="info-item">
+                <span class="label">SCORE</span>
+                <span class="val" id="simonScore">0</span>
+              </div>
+              <div class="info-item">
+                <span class="label">BEST</span>
+                <span class="val" id="simonBest">0</span>
+              </div>
+            </div>
+
+            <p class="game-hint" id="simonHint">Press Start and repeat A.X.E.L.'s holographic pattern!</p>
+
+            <!-- 4 Cyber Simon Pads -->
+            <div class="simon-pad-grid">
+              <button class="simon-pad pad-cyan" data-pad="0" id="pad0" aria-label="Cyan Pad"></button>
+              <button class="simon-pad pad-magenta" data-pad="1" id="pad1" aria-label="Magenta Pad"></button>
+              <button class="simon-pad pad-emerald" data-pad="2" id="pad2" aria-label="Emerald Pad"></button>
+              <button class="simon-pad pad-amber" data-pad="3" id="pad3" aria-label="Amber Pad"></button>
+            </div>
+
+            <button class="cyber-btn-primary game-action-btn" id="btnStartSimon">
+              <span class="btn-text">START MEMORY TEST</span>
+            </button>
+          </div>
+
+          <!-- Game 2: Cyber Rock-Paper-Scissors -->
+          <div class="game-container" id="gameRps">
+            <div class="game-info-bar">
+              <div class="info-item">
+                <span class="label">PLAYER</span>
+                <span class="val" id="rpsPlayerScore">0</span>
+              </div>
+              <div class="info-item">
+                <span class="label">DRAWS</span>
+                <span class="val" id="rpsDraws">0</span>
+              </div>
+              <div class="info-item">
+                <span class="label">A.X.E.L.</span>
+                <span class="val" id="rpsRobotScore">0</span>
+              </div>
+            </div>
+
+            <!-- RPS Arena Display -->
+            <div class="rps-arena">
+              <div class="rps-fighter">
+                <span class="fighter-tag">YOU</span>
+                <div class="rps-choice-bubble" id="rpsPlayerDisplay">❓</div>
+              </div>
+              <div class="rps-vs">VS</div>
+              <div class="rps-fighter">
+                <span class="fighter-tag">A.X.E.L.</span>
+                <div class="rps-choice-bubble robot-choice" id="rpsRobotDisplay">❓</div>
+              </div>
+            </div>
+
+            <div class="rps-status-banner" id="rpsStatus">Choose your weapon below!</div>
+
+            <!-- Weapon Choices -->
+            <div class="rps-controls-grid">
+              <button class="rps-btn" data-choice="rock" id="rpsRock">
+                <span class="rps-emoji">🪨</span>
+                <span class="rps-name">CYBER ROCK</span>
+              </button>
+              <button class="rps-btn" data-choice="paper" id="rpsPaper">
+                <span class="rps-emoji">📄</span>
+                <span class="rps-name">NANO PAPER</span>
+              </button>
+              <button class="rps-btn" data-choice="scissors" id="rpsScissors">
+                <span class="rps-emoji">✂️</span>
+                <span class="rps-name">LASER SCISSORS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Game 3: Cyber Reflex Speed Test -->
+          <div class="game-container" id="gameReflex">
+            <div class="game-info-bar">
+              <div class="info-item">
+                <span class="label">LAST TIME</span>
+                <span class="val" id="reflexLast">-- ms</span>
+              </div>
+              <div class="info-item">
+                <span class="label">RECORD</span>
+                <span class="val" id="reflexBest">-- ms</span>
+              </div>
+            </div>
+
+            <!-- Interactive Reflex Target Pad -->
+            <div class="reflex-pad-zone" id="reflexZone">
+              <div class="reflex-icon" id="reflexIcon">⚡</div>
+              <h3 class="reflex-title" id="reflexTitle">CLICK TO ARM SENSOR</h3>
+              <p class="reflex-desc" id="reflexDesc">When the screen turns NEON GREEN, click as fast as humanly possible!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Robot Sound & Voice Synthesizer Sandbox -->
+        <div class="glass-card synth-card">
+          <h2 class="card-title">ROBOT AUDIO SYNTHESIZER</h2>
+          <div class="synth-sliders">
+            <div class="slider-row">
+              <label for="pitchSlider">VOICE FREQUENCY</label>
+              <input type="range" id="pitchSlider" min="200" max="1200" value="550" class="cyber-range">
+            </div>
+            <div class="slider-row">
+              <label for="tempoSlider">MODULATION SPEED</label>
+              <input type="range" id="tempoSlider" min="50" max="400" value="180" class="cyber-range">
+            </div>
+          </div>
+          <button class="cyber-btn-ghost w-100" id="btnTestSynth">
+            <span>🔊 TEST ROBOTIC FREQUENCY</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="pulse-dot"></span>
+        <span>A.X.E.L. NEURAL LINK ACTIVE // THREE.JS 3D ACCELERATED</span>
+      </div>
+      <div class="footer-right">
+        <span>TIP: Orbit the 3D model with your mouse, test controls, or play arcade games!</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Robot 3D Information Modal -->
+  <div class="modal-backdrop" id="robotInfoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="glass-card modal-content">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="card-tag">TELEMETRY & SPECS</span>
+          <h2 class="modal-title" id="modalTitle">A.X.E.L. 3D SYSTEM SPECIFICATIONS</h2>
+        </div>
+        <button class="modal-close-btn" id="btnCloseModal" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-grid">
+          <div class="info-tile">
+            <span class="info-label">UNIT DESIGNATION</span>
+            <span class="info-value" id="specModelName">A.X.E.L. Cyber Unit</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">SOURCE ASSET</span>
+            <span class="info-value code-font" id="specAssetPath">public/models/robot.glb</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">TOTAL MESHES</span>
+            <span class="info-value highlight" id="specMeshCount">100 Independent Meshes</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">POLYGON COMPLEXITY</span>
+            <span class="info-value" id="specPolyCount">20,419 Triangles / 40,056 Vertices</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">PHYSICAL DIMENSIONS</span>
+            <span class="info-value" id="specDimensions">0.91m (W) × 1.38m (H) × 0.80m (D)</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">SHADING & MATERIALS</span>
+            <span class="info-value" id="specMaterialCount">11 PBR Materials (Metallic / Emissive)</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">ANIMATION SUBSYSTEM</span>
+            <span class="info-value" id="specAnimSystem">Procedural Kinematics (Three.js + GSAP)</span>
+          </div>
+          <div class="info-tile">
+            <span class="info-label">HARDWARE ACCELERATION</span>
+            <span class="info-value text-success" id="specGpuStatus">WebGL 2.0 // Active @ 60 FPS</span>
+          </div>
+        </div>
+
+        <div class="controls-guide-box">
+          <h3 class="guide-title">3D VIEWPORT INTERACTION GUIDE</h3>
+          <ul class="guide-list">
+            <li><kbd>Left Click + Drag</kbd> Free 360° Orbit & Camera Elevation</li>
+            <li><kbd>Scroll Wheel / Pinch</kbd> Smooth Dynamic Zoom In / Zoom Out</li>
+            <li><kbd>Hover / Click Mesh</kbd> Capacitive Touch Sensor & Glowing Outline</li>
+            <li><kbd>3D Control Matrix</kbd> Quick-action cinematic controls below the stage</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="cyber-btn-primary" id="btnModalAcknowledge">
+          <span class="btn-text">CLOSE TELEMETRY HUD</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
